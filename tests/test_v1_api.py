@@ -2,8 +2,8 @@
 
 import datetime
 import json
-import unittest
-import mock 
+from unittest import TestCase
+from mock import MagicMock, patch
 
 # Normal imports
 from duffy.app import create_app
@@ -16,11 +16,11 @@ from duffy.models import Host, Session, Project
 from duffy.models.nodes import uuid
 
 
-class DuffyV1ApiTests(unittest.TestCase):
+class DuffyV1ApiTests(TestCase):
     def setUp(self):
         self.testapp = create_app(CONFIG)
         self.client = self.testapp.test_client()
-        m = mock.MagicMock(return_value=True)
+        m = MagicMock(return_value=True)
         Host.contextualize = m
         with self.testapp.app_context():
             _populate_test_data()
@@ -274,7 +274,7 @@ class DuffyV1ApiTests(unittest.TestCase):
         assert any('n1.hufty' in x for x in idata)
         assert any('n4.hufty' in x for x in idata)
 
-    @mock.patch.object(uuid, 'uuid4', return_value='deadbeef')
+    @patch.object(uuid, 'uuid4', return_value='deadbeef')
     def test_inventory_without_apikey_returns_all_hosts(self, mock_uuid):
         r = self.client.get('/Node/get?key=asdf-1234&count=2')
         n1huftylist = [1, u'n1.hufty', u'127.0.0.1', u'hufty', 4, u'Deployed', u'deadbeef', None, None, u'7', u'x86_64', 1, 123, None]
